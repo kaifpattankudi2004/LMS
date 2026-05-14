@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if note %}Edit Note{% else %}New Note{% endif %} - {{ subject.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 2rem auto;">
+    <nav style="margin-bottom: 2rem; background: transparent; backdrop-filter: none; border: none; padding: 0;">
+        <a href="{% url 'notes_list' subject.id %}" style="text-decoration: none; color: var(--accent-color); font-weight: 600;">← Back to {{ subject.name }}</a>
+    </nav>
+
+    <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow);">
+        <h1 style="margin-bottom: 2rem;">{% if note %}Edit Note{% else %}Create New Note{% endif %}</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Title</label>
+                <input type="text" name="title" value="{{ note.title }}" required placeholder="e.g. Important Python Concepts" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem;">
+            </div>
+            
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Content</label>
+                <textarea name="content" rows="12" required placeholder="Write your notes here..." style="width: 100%; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-color); font-size: 1rem; font-family: inherit; resize: vertical; line-height: 1.6;">{{ note.content }}</textarea>
+            </div>
+            
+            <div style="display: flex; gap: 1rem;">
+                <a href="{% url 'notes_list' subject.id %}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+                <button type="submit" class="btn btn-primary" style="flex: 2;">{% if note %}Save Changes{% else %}Create Note{% endif %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

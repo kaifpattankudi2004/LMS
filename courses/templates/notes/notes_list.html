@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ subject.name }} - Notes{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 250px 1fr; gap: 2rem; margin-top: 2rem;">
+    <!-- Sidebar -->
+    <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.5rem; height: fit-content; position: sticky; top: 2rem;">
+        <h3 style="margin-bottom: 1rem; font-size: 1rem; text-transform: uppercase; color: var(--text-muted);">Subjects</h3>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem;">
+            {% for s in subjects %}
+                <li>
+                    <a href="{% url 'notes_list' s.id %}" style="display: block; padding: 0.75rem; border-radius: 8px; text-decoration: none; color: {% if s.id == subject.id %}var(--accent-color){% else %}var(--text-color){% endif %}; background: {% if s.id == subject.id %}var(--border-color){% else %}transparent{% endif %}; font-weight: {% if s.id == subject.id %}600{% else %}400{% endif %};">
+                        {{ s.name }}
+                    </a>
+                </li>
+            {% endfor %}
+            <li style="margin-top: 1rem;">
+                <a href="{% url 'subject_list' %}" style="display: block; padding: 0.75rem; text-align: center; border: 1px dashed var(--border-color); border-radius: 8px; text-decoration: none; color: var(--text-muted); font-size: 0.875rem;">
+                    ← All Subjects
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">{{ subject.name }}</h1>
+                <p style="color: var(--text-muted);">{{ notes|length }} notes in this subject</p>
+            </div>
+            <a href="{% url 'create_note' subject.id %}" class="btn btn-primary">+ New Note</a>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% for note in notes %}
+                <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <h2 style="font-size: 1.25rem; margin: 0;">{{ note.title }}</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'edit_note' note.id %}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.875rem;">Edit</a>
+                            <form action="{% url 'delete_note' note.id %}" method="post" onsubmit="return confirm('Delete this note?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.875rem; color: #ef4444;">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div style="color: var(--text-color); white-space: pre-wrap; font-size: 0.95rem; line-height: 1.7; margin-bottom: 1rem;">{{ note.content }}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                        Last updated: {{ note.updated_at|date:"F j, Y, g:i a" }}
+                    </div>
+                </div>
+            {% empty %}
+                <div style="text-align: center; padding: 4rem; background: var(--card-bg); border-radius: var(--radius); border: 1px dashed var(--border-color);">
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">No notes in this subject yet.</p>
+                    <a href="{% url 'create_note' subject.id %}" class="btn btn-primary">Create First Note</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

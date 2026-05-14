@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 3rem; margin-top: 2rem;">
+    <div>
+        <span class="course-category">{{ course.category }}</span>
+        <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">{{ course.title }}</h1>
+        <p style="font-size: 1.125rem; color: var(--text-muted); margin-bottom: 2rem;">{{ course.description }}</p>
+
+        <h2 style="margin-bottom: 1rem;">Course Content</h2>
+        <div style="border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden;">
+            {% for lesson in lessons %}
+                <div style="padding: 1rem; border-bottom: {% if not forloop.last %}1px solid var(--border-color){% else %}none{% endif %}; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="color: var(--text-muted); font-weight: 600;">{{ forloop.counter }}</span>
+                        <span>{{ lesson.title }}</span>
+                    </div>
+                    {% if is_enrolled %}
+                        <a href="{% url 'lesson_detail' course.id lesson.id %}" style="color: var(--accent-color); font-weight: 600; text-decoration: none;">Watch</a>
+                    {% else %}
+                        <span style="color: var(--text-muted); font-size: 0.875rem;">Locked</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        <div style="position: sticky; top: 2rem; border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow);">
+            <img src="{{ course.thumbnail }}" alt="{{ course.title }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1.5rem;">
+            
+            {% if is_enrolled %}
+                <div style="text-align: center;">
+                    <p style="margin-bottom: 1rem; font-weight: 600;">You are enrolled!</p>
+                    <a href="{% url 'lesson_detail' course.id course.lessons.first.id %}" class="btn btn-primary" style="width: 100%;">Continue Learning</a>
+                </div>
+            {% else %}
+                <div style="text-align: center;">
+                    <h3 style="margin-bottom: 1rem;">Free Enrollment</h3>
+                    {% if user.is_authenticated %}
+                        <form action="{% url 'enroll' course.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Enroll Now</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary" style="width: 100%;">Login to Enroll</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+
+        </div>
+    </div>
+</div>
+{% endblock %}

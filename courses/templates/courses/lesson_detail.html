@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <a href="{% url 'course_detail' course.id %}" style="text-decoration: none; color: var(--text-muted); font-weight: 500;">← Back to {{ course.title }}</a>
+</div>
+
+<div class="lesson-layout">
+    <div>
+        <div class="video-container">
+            <div id="player"></div>
+        </div>
+        
+        <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <h1 style="font-size: 1.75rem;">{{ lesson.title }}</h1>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <form id="completion-form" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="complete" value="1">
+                    {% if progress.completed %}
+                        <button type="button" class="btn btn-secondary" disabled>✓ Completed</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-primary" id="complete-btn">Mark as Completed</button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <div>
+                {% if prev_lesson %}
+                    <a href="{% url 'lesson_detail' course.id prev_lesson.id %}" class="btn btn-secondary">← Previous: {{ prev_lesson.title }}</a>
+                {% endif %}
+            </div>
+            <div>
+                {% if next_lesson %}
+                    <a href="{% url 'lesson_detail' course.id next_lesson.id %}" class="btn btn-secondary">Next: {{ next_lesson.title }} →</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="lesson-sidebar">
+        <h3>Course Content</h3>
+        <ul class="lesson-list">
+            {% for l in lessons %}
+                <li class="lesson-item {% if l.id == lesson.id %}active{% endif %}">
+                    <a href="{% url 'lesson_detail' course.id l.id %}">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span>{{ forloop.counter }}.</span>
+                            <span>{{ l.title }}</span>
+                        </div>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+    var player;
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            height: '100%',
+            width: '100%',
+            videoId: '{{ lesson.video_id }}',
+            playerVars: {
+                'rel': 0,
+                'modestbranding': 1,
+                'autoplay': 0,
+                'origin': window.location.origin
+            },
+            events: {
+                'onStateChange': onPlayerStateChange
+            }
+        });
+    }
+
+    function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.ENDED) {
+            markLessonComplete();
+        }
+    }
+
+    function markLessonComplete() {
+        const btn = document.getElementById('complete-btn');
+        if (!btn || btn.disabled) return;
+
+        const formData = new FormData();
+        formData.append('complete', '1');
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                btn.className = 'btn btn-secondary';
+                btn.disabled = true;
+                btn.textContent = '✓ Completed';
+            }
+        })
+        .catch(error => console.error('Error marking lesson complete:', error));
+    }
+</script>
+{% endblock %}

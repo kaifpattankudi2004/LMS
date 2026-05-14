@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}My Learning{% endblock %}
+
+{% block content %}
+<div class="header" style="text-align: left; margin-bottom: 3rem;">
+    <h1>Welcome back, {{ user.username }}!</h1>
+    <p>Track your progress and continue your learning journey.</p>
+</div>
+
+<h2 style="margin-bottom: 1.5rem;">Your Enrolled Courses</h2>
+
+<div class="dashboard-grid">
+    {% for item in course_progress %}
+        <div class="dashboard-card">
+            <img src="{{ item.course.thumbnail }}" alt="{{ item.course.title }}" style="width: 120px; height: 80px; object-fit: cover; border-radius: 8px;">
+            <div style="flex: 1;">
+                <h3 style="margin-bottom: 0.5rem;">{{ item.course.title }}</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+                    <span style="font-size: 0.875rem; color: var(--text-muted);">{{ item.completed_lessons }}/{{ item.total_lessons }} lesson{% if item.total_lessons != 1 %}s{% endif %} completed</span>
+                    <span style="font-size: 0.875rem; font-weight: 700;">{{ item.progress_percent }}%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: {{ item.progress_percent }}%;"></div>
+                </div>
+            </div>
+            <a href="{% url 'course_detail' item.course.id %}" class="btn btn-secondary">Go to Course</a>
+        </div>
+    {% empty %}
+        <div style="text-align: center; padding: 4rem; border: 1px dashed var(--border-color); border-radius: var(--radius);">
+            <h3>You haven't enrolled in any courses yet.</h3>
+            <p style="margin-bottom: 1.5rem;">Start exploring our catalog and enroll in your first course!</p>
+            <a href="{% url 'home' %}" class="btn btn-primary">Browse Courses</a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

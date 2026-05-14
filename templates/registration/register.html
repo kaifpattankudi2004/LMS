@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<style>
+/* Inline CSS to fix caching issues */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f7f6;
+    margin: -2rem -20px -4rem -20px;
+    padding: 2rem;
+}
+
+.auth-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 900px;
+    max-width: 100%;
+    background: linear-gradient(135deg, #2b70b5 0%, #16538b 100%);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    position: relative;
+}
+
+.auth-wrapper::before,
+.auth-wrapper::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+}
+.auth-wrapper::before {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    left: -100px;
+}
+.auth-wrapper::after {
+    width: 500px;
+    height: 500px;
+    bottom: -200px;
+    left: 10%;
+}
+
+.auth-left {
+    flex: 1;
+    padding: 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: white;
+    z-index: 1;
+}
+
+.auth-left h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+}
+
+.auth-left .headline {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    letter-spacing: 1px;
+}
+
+.auth-left .description {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.auth-right {
+    flex: 1;
+    padding: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.auth-container {
+    background: white;
+    width: 100%;
+    max-width: 400px;
+    padding: 3rem 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.auth-container h2 {
+    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1a2b4c;
+}
+
+.auth-subtitle {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.auth-container label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #333;
+}
+
+.auth-container input[type="text"],
+.auth-container input[type="password"],
+.auth-container input[type="email"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    margin-bottom: 1.25rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    color: #333;
+    background: white;
+}
+
+.auth-container input:focus {
+    outline: none;
+    border-color: #2b70b5;
+}
+
+.auth-submit-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background: #2b70b5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.auth-submit-btn:hover {
+    background: #16538b;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.auth-footer a {
+    color: #1a2b4c;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.helptext, .auth-container form ul {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .auth-wrapper {
+        flex-direction: column !important;
+    }
+    .auth-left {
+        padding: 3rem 2rem;
+        text-align: center;
+    }
+    .auth-right {
+        padding: 2rem;
+    }
+}
+</style>
+<div class="auth-page">
+    <div class="auth-wrapper">
+        <div class="auth-left">
+            <h2>WELCOME</h2>
+            <p class="headline">YOUR HEADLINE NAME</p>
+            <p class="description">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation.</p>
+        </div>
+        <div class="auth-right">
+            <div class="auth-container">
+                <h2>Sign up</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <div class="alert alert-error">
+                            <p>Please correct the errors below.</p>
+                        </div>
+                    {% endif %}
+                    {{ form.as_p }}
+
+                    <button type="submit" class="auth-submit-btn">Sign up</button>
+                </form>
+                <p class="auth-footer">
+                    Already have an account? <a href="{% url 'login' %}">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
